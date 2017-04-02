@@ -49,6 +49,9 @@ public abstract class NewsListFragment extends Fragment {
     private LinearLayoutManager mManager;
 
     public NewsListFragment() {}
+    public interface OnItemClickListener{
+        void onItemClick(View v, int position);
+    }
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
@@ -193,12 +196,12 @@ public abstract class NewsListFragment extends Fragment {
                         newsArrayKey=getKeys;
                         for(int i=0;i<tempNews.size();i++){
                             newsArrayList.add(tempNews.get(i));
-                            newsArrayKey.add(tempkeys.get(9));
+                            newsArrayKey.add(tempkeys.get(i));
                         }
                         notifyItemRangeInserted(0,9);
                         mpaginateprogbar.setVisibility(View.GONE);
-                        getKeys=new ArrayList<String>();
-                        getNews=new ArrayList<News>();
+                        getKeys=new ArrayList<>();
+                        getNews=new ArrayList<>();
                     }
                     if(getNews.size()==1){
                         mLastkey=dataSnapshot.getKey();
@@ -234,7 +237,14 @@ public abstract class NewsListFragment extends Fragment {
         public NewsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater=LayoutInflater.from(ctx);
             View v=inflater.inflate(R.layout.item_news,parent,false);
-            NewsViewHolder holder=new NewsViewHolder(v);
+            NewsViewHolder holder=new NewsViewHolder(v, new OnItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
+                    intent.putExtra(NewsDetailActivity.EXTRA_NEWS_KEY, newsArrayKey.get(position));
+                    startActivity(intent);
+                }
+            });
             return holder;
         }
 
@@ -243,15 +253,13 @@ public abstract class NewsListFragment extends Fragment {
 
             mProgressBar.setVisibility(ProgressBar.INVISIBLE);
             // Set click listener for the whole news view
-           holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Launch NewsDetailActivity
-                    Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
-                    intent.putExtra(NewsDetailActivity.EXTRA_NEWS_KEY, newsArrayKey.get(position));
-                    startActivity(intent);
-                }
-            });
+//           holder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    // Launch NewsDetailActivity
+//
+//                }
+//            });
             holder.bindToNews(newsArrayList.get(position),
                     getContext());
             if (position==0){

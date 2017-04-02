@@ -52,7 +52,7 @@ public abstract class PostListFragment extends Fragment {
     ProgressBar rprogress;
 
     private boolean recentornot=false;
-//    private FirebaseRecyclerAdapter<Post, PostViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<Post, PostViewHolder> mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
 //    ArrayList<Post> postlist;
