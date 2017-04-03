@@ -50,6 +50,8 @@ public abstract class PostListFragment extends Fragment {
     private  ProgressBar mProgressBar;
     private OnItemClickListener listener;
     ProgressBar rprogress;
+    private boolean removedornot=false;
+    private boolean removedornotmd=false;
 
     private boolean recentornot=false;
     private FirebaseRecyclerAdapter<Post, PostViewHolder> mAdapter;
@@ -187,7 +189,7 @@ public abstract class PostListFragment extends Fragment {
 //            void onItemClick(View v,int position);
 //        }
 
-        public Myadapter(Context context, Query postquery) {
+        public Myadapter(Context context, final Query postquery) {
             this.context = context;
             this.postquery=postquery;
 
@@ -195,26 +197,54 @@ public abstract class PostListFragment extends Fragment {
             postquery.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if(removedornot){
+                        postlist.add(0,dataSnapshot.getValue(Post.class));
+                        postkeys.add(0,dataSnapshot.getKey());
+                        notifyItemInserted(0);
+                        mLastkey=dataSnapshot.getKey();
+                        removedornot=false;
+                    }else{
                     postlist.add(dataSnapshot.getValue(Post.class));
                     postkeys.add(dataSnapshot.getKey());
                     notifyItemInserted(postlist.size()-1);
                     if(postlist.size()==1){
-                        mLastkey=dataSnapshot.getKey();}
-                    Log.d("Tag11",dataSnapshot.getValue(Post.class).title);
+                        mLastkey=dataSnapshot.getKey();
+                    }}
+                    Log.d("Tag112",dataSnapshot.getValue(Post.class).title);
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                    Post changedPost=dataSnapshot.getValue(Post.class);
+                    String changedkey=dataSnapshot.getKey();
+                    int changedindex=postkeys.indexOf(changedkey);
+                    if(changedindex>-1){
+                    postlist.set(changedindex,changedPost);
+                    postkeys.set(changedindex,changedkey);
+                    notifyItemChanged(changedindex);
+                        Log.d("TAG11","childchanged");
+                    }else {
+//                       Log.d(TAG,"unknown child changed");
+                    }
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    String changedkey=dataSnapshot.getKey();
+                    int changedindex=postkeys.indexOf(changedkey);
+                    if(changedindex>-1){
+                        postlist.remove(changedindex);
+                        postkeys.remove(changedindex);
+                        notifyItemRemoved(changedindex);
+                        removedornot=true;
+                        Log.d("TAG112",String.valueOf(changedindex));
+                    }
 
                 }
 
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    Log.d("TAG11","childmoved");
 
                 }
 
@@ -235,6 +265,13 @@ public abstract class PostListFragment extends Fragment {
             postsQuery.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if(removedornotmd){
+                        postlist.add(0,dataSnapshot.getValue(Post.class));
+                        postkeys.add(0,dataSnapshot.getKey());
+                        notifyItemInserted(0);
+                        mLastkey=dataSnapshot.getKey();
+                        removedornotmd=false;
+                    }else{
                     getPost.add(dataSnapshot.getValue(Post.class));
                     getKeys.add(dataSnapshot.getKey());
                     if(getPost.size()==10){
@@ -255,18 +292,34 @@ public abstract class PostListFragment extends Fragment {
                     if(getPost.size()==1){
                         mLastkey=dataSnapshot.getKey();
                         Log.d("ttAG","changedkey");
-                    }
+                    }}
                     Log.d("Tag11",dataSnapshot.getValue(Post.class).title);
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                    Post changedPost=dataSnapshot.getValue(Post.class);
+                    String changedkey=dataSnapshot.getKey();
+                    int changedindex=postkeys.indexOf(changedkey);
+                    if(changedindex>-1){
+                        postlist.set(changedindex,changedPost);
+                        postkeys.set(changedindex,changedkey);
+                        notifyItemChanged(changedindex);
+                    }else {
+//                       Log.d(TAG,"unknown child changed");
+                    }
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    String changedkey=dataSnapshot.getKey();
+                    int changedindex=postkeys.indexOf(changedkey);
+                    if(changedindex>-1){
+                        postlist.remove(changedindex);
+                        postkeys.remove(changedindex);
+                        notifyItemRemoved(changedindex);
+                        removedornotmd=true;
+                    }
                 }
 
                 @Override
